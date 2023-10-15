@@ -58,6 +58,10 @@ app.get('/api/persons/:id', (req, res) => {
       res.status(404).end()
     }
   })
+  .catch(error => {
+    console.log(error)
+    res.status(500).end()
+  })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
