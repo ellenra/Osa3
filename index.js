@@ -15,6 +15,18 @@ morgan.token('newContact', (req) => {
 
 app.use(morgan(':method :url :status - :response-time ms :newContact'))
 
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
 
 let persons = [
   {
@@ -50,7 +62,7 @@ app.get('/info', (req, res) => {
   <div>${Date()}</div>`)
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id).then(person => {
     if (person) {
       res.json(person)
@@ -58,16 +70,27 @@ app.get('/api/persons/:id', (req, res) => {
       res.status(404).end()
     }
   })
-  .catch(error => {
-    console.log(error)
-    res.status(500).end()
-  })
+  .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
-  res.status(204).end()
+app.put('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id)
+    .then(person => {
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndRemove(req.params.id)
+  .then(result => {
+    res.status(204).end()
+  })
+  .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res) => {
