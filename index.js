@@ -30,29 +30,6 @@ const errorHandler = (error, req, res, next) => {
 app.use(errorHandler)
 
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456"
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323423"
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345"
-  },
-  {
-    id: 4,
-    name: "Mary Poppendick",
-    number: "39-23-6423122"
-  }
-]
-
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
     res.json(persons)
@@ -93,7 +70,7 @@ app.put('/api/persons/:id', (req, res, next) => {
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
-    .then(result => {
+    .then(() => {
       res.status(204).end()
     })
     .catch(error => next(error))
